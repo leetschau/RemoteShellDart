@@ -1,4 +1,3 @@
-//import 'dart:io';
 import 'package:polymer/polymer.dart';
 
 /**
@@ -6,14 +5,14 @@ import 'package:polymer/polymer.dart';
  */
 @CustomTag('shell-runner')
 class ShellRunner extends PolymerElement {
-  @observable String shellname = "";
+  @observable Map input = toObservable({'shellname' : ''});
   @observable String shellresult = "";
 
   ShellRunner.created() : super.created() {
   }
 
   void runshell() {
-    print("Now shell $shellname runs.");
-    shellresult = "result of $shellname";
+    print("Send shell command ${input['shellname']} to server.");
+
   }
 }
