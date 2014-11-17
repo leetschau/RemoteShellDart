@@ -1,0 +1,33 @@
+<!-- import polymer-element's definition -->
+<link rel="import" href="packages/polymer/polymer.html">
+
+<polymer-element name="shell-runner">
+  <template>
+    <style>
+      div {
+        font-size: 16pt;
+        text-align: left;
+        margin-top: 20px;
+        margin-left: 20px;
+      }
+
+      button {
+        font-size: 16pt;
+        margin-bottom: 20px;
+      }
+    </style>
+    <div>
+      <label>请输入服务器命令：</label>
+      <input type="text" value="{{shellname}}">
+    </div>
+
+    <div>
+      <button on-click="{{runshell}}">运行</button><br>
+    </div>
+
+    <div>
+      <input type="text" value="{{shellresult}}">
+    </div>
+  </template>
+  <script type="application/dart" src="shell_runner.dart"></script>
+</polymer-element>
