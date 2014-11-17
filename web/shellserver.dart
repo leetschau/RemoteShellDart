@@ -1,35 +1,65 @@
 import 'dart:io';
 
-int PORT = 8082;
+//final HOST = InternetAddress.ANY_IP_V4;
+final HOST = InternetAddress.LOOPBACK_IP_V4;
+final PORT = 8082;
 
 void main() {
   print("Server listening on port $PORT ...");
-  HttpServer.bind(InternetAddress.ANY_IP_V4, PORT)
-    .then(listenForRequest)
-    .catchError((e) => print (e.toString()));
+  HttpServer.bind(HOST, PORT).then(gotMessage, onError: printError);
 }
 
-listenForRequest(HttpServer _server) {
-  _server.listen(
-    (HttpRequest request){
-      if (request.method == 'GET') {
-        handleGet(request);
-      } else {
-        request.response.statusCode = HttpStatus.METHOD_NOT_ALLOWED;
-        request.response.write("Unsupported request: ${request.method}.");
-        request.response.close();
-      }
-    },
-    onDone: () => print('No more requests.'),
-    onError: (e) => print(e.toString())
-  );
+void gotMessage(_server) {
+  _server.listen((HttpRequest request) {
+    switch (request.method) {
+      case 'POST':
+        handlePost(request);
+        break;
+      case 'OPTIONS':
+        handleOptions(request);
+        break;
+      default: defaultHandler(request);
+    }
+  },
+  onError: printError); // .listen failed
+  print('Listening for GET and POST on http://$HOST:$PORT');
 }
 
-void handleGet(HttpRequest request) {
-  String shellname = request.uri.queryParameters['q'];
-  print('Receive shell command $shellname from client.');
-  Process.run(shellname, []).then((result) {
-    request.response.writeln(result.stdout);
-    request.response.close();
-  });
+void handlePost(HttpRequest req) {
+  HttpResponse res = req.response;
+  print('${req.method}: ${req.uri.path}');
+
+  addCorsHeaders(res);
+
+  req.listen((List<int> buffer) {
+    // return the data back to the client
+    res.write('Thanks for the data. This is what I heard you say: ');
+    res.write(new String.fromCharCodes(buffer));
+    res.close();
+  },
+  onError: printError);
 }
+
+void addCorsHeaders(HttpResponse res) {
+  res.headers.add('Access-Control-Allow-Origin', '*');
+  res.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.headers.add('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+}
+
+void handleOptions(HttpRequest req) {
+  HttpResponse res = req.response;
+  addCorsHeaders(res);
+  print('${req.method}: ${req.uri.path}');
+  res.statusCode = HttpStatus.NO_CONTENT;
+  res.close();
+}
+
+void defaultHandler(HttpRequest req) {
+  HttpResponse res = req.response;
+  addCorsHeaders(res);
+  res.statusCode = HttpStatus.NOT_FOUND;
+  res.write('Not found: ${req.method}, ${req.uri.path}');
+  res.close();
+}
+
+void printError(error) => print(error);
