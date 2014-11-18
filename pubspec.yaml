@@ -1,7 +1,8 @@
 name: RemoteShell
-description: A sample Polymer application
+description: A remote shell runner
 dependencies:
     polymer: ">=0.12.0 <0.13.0"
+    http_server: ">=0.9.4 <0.10.0"
 transformers:
 - polymer:
     entry_points: web/shellclient.html

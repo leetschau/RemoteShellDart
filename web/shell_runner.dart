@@ -2,14 +2,11 @@ import 'dart:html';
 import 'dart:convert';
 import 'package:polymer/polymer.dart';
 
-/**
- * A Polymer click counter element.
- */
 @CustomTag('shell-runner')
 class ShellRunner extends PolymerElement {
 
-//  final IP = "10.31.4.73";
-  final IP = "127.0.0.1";
+  final IP = "10.31.4.73";
+  // final IP = "127.0.0.1";
   final PORT = 8082;
 
   @observable Map input = toObservable({'shellname' : ''});
@@ -27,24 +24,21 @@ class ShellRunner extends PolymerElement {
 
     request.onReadyStateChange.listen(onData);
 
-    // POST the data to the server.
     var url = 'http://$IP:$PORT';
-    print("url: $url");
-    print('-----');
-    print(_shellAsJsonData());
-    print('-----');
+    String inputData = JSON.encode(input);
+    print('Send $inputData to $url');
     request.open('POST', url);
-    request.send(_shellAsJsonData());
+    request.send(inputData);
   }
 
   void onData(_) {
+    print('Receive data from server: ${request.responseText}');
     if (request.readyState == HttpRequest.DONE &&
         request.status == 200) {
-      // Data saved OK.
-      serverResponse = request.responseText;
+      Map recData = JSON.decode(request.responseText);
+      serverResponse = recData['shell'];
     } else if (request.readyState == HttpRequest.DONE &&
         request.status == 0) {
-      // Status is 0...most likely the server isn't running.
       serverResponse = 'No server connected.';
     }
   }
@@ -53,9 +47,5 @@ class ShellRunner extends PolymerElement {
     e.preventDefault();
     input['shellname'] = '';
     serverResponse = '';
-  }
-
-  String _shellAsJsonData() {
-    return JSON.encode(input);
   }
 }

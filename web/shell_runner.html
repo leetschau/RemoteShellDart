@@ -11,7 +11,15 @@
         margin-left: 20px;
       }
 
-      button {
+      .buttons {
+        font-size: 16pt;
+        margin-bottom: 20px;
+      }
+
+      .responsetext {
+        width: 80%;
+        height: 250px;
+        max-height: 250px;
         font-size: 16pt;
         margin-bottom: 20px;
       }
@@ -22,8 +30,8 @@
     </div>
 
     <div>
-      <input type="submit" value="运行" on-click="{{submitForm}}">
-      <input type="reset"  value="清空"  on-click="{{resetForm}}"> <br>
+      <input type="submit" class="buttons" value="运行" on-click="{{submitForm}}">
+      <input type="reset"  class="buttons" value="清空"  on-click="{{resetForm}}"> <br>
       <textarea disabled class="responsetext" value="{{serverResponse}}"></textarea>
     </div>
   </template>
